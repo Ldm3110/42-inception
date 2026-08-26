@@ -382,8 +382,8 @@ Puis des infos plus spécifiques comme :
 - depends_on -> Le fameux ... permet de préciser que ce container ne sera execute QUE SI bdd a fonctionné et est en cours d'execution
 - volumes -> "Où ce situent les volumes de ma bdd"
 
-[!WARNING]
-Petite précision : On n'expose JAMAIS des variables d'environnement en dur dans un fichier de configuration !!!
+> [!CAUTION]
+> **Petite précision : On n'expose JAMAIS des variables d'environnement en dur dans un fichier de configuration !!!**
 
 Pour cela on préfère créer un fichier spécifique, qui ne sera partagé à personne (que d'autres utilisateurs devront recrée même) afin de sécuriser ces données
 
