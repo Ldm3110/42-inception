@@ -183,7 +183,7 @@ For more help on how to use Docker, head to https://docs.docker.com/go/guides/
 
 Ici pour pouvoir créer notre image nous devrons faire 
 ```
-docker build -t <nom de l'image> .
+docker build -t <nom de l'image> <dossier contenant mon Dockerfile>
 ```
 Pour connaitre les options propres à une commande spécifique il suffit de rajouter l'option --help, par exemple
 ```
