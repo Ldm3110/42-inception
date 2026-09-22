@@ -379,7 +379,7 @@ Pour chacun d'eux on retrouve des infos similaires :
 Puis des infos plus spécifiques comme :
 
 - ports -> "Sur quel port je vais écouter/fonctionner"
-- depends_on -> Le fameux ... permet de préciser que ce container ne sera execute QUE SI bdd a fonctionné et est en cours d'execution
+- depends_on -> Le fameux ... permet de préciser que ce container ne sera execute QUE SI le container bdd s'est bien lancé.
 - volumes -> "Où ce situent les volumes de ma bdd"
 
 > [!CAUTION]
@@ -429,4 +429,36 @@ Ainsi l'ordre d'execution serait
 2 - docker-compose run le container -> à ce moment il voit qu'il existe des secrets alors il monte ce fichier dans le container pour qu'il soit accessible depuis l'intérieur
 3 - ENTRYPOINT entre en jeu -> le process principal étant changé avec ce mot clé, il applique le script qui justement va effectuer les étapes nécessaires en s'appuyant sur les secrets fournis par l'utilisateur
 ```
+
+*Petite note sur `depends_on`* 
+On peut l'améliorer selon le besoin, en définissant des `health_checks`. Par exemple, notre site wordpress ne peux pas fonctionner si mariadb n'est pas totalement fonctionnel.
+Donc, on veut faire en sorte que wordpress attende que le programme mariadb soit entièrement prêt avant de commencer à build le container wordpress.
+Dand ce cas, on défini un `health_check` pour mariadb, tel que, par exemple :
+```yml
+services:
+  mariadb:
+    container_name: mariadb
+
+    ...
+
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -u root -p$${DB_ADMIN_PASS}"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+```
+La balise `test` défini une commande qui sera executé pour faire le check, si elle échoue, la commande est recommencé, comme défini par les balises suivantes : 5 fois, toutes les 5 secondes, en attendant à chaque fois 2 secondes pour voir un résultat positif.
+
+Au niveau de notre service wordpress, on ajoute donc une condition, tel que :
+```yml
+  wordpress:
+
+    ...
+
+    depends_on:
+      mariadb:
+        condition: service_healthy
+```
+Cette fois, on ne build wordpress que lorsque mariadb renvoie `service_healthy`, et on est sûr que notre container peut se build sans soucis !
 
