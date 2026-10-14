@@ -3,10 +3,7 @@
 # stop the script at the first error
 set -e
 
-# export all env variables
-set -a
-source .env
-set +a
+source /run/secrets/credentials
 
 # creates folder because i don't use "service mariadb start"
 mkdir -p /run/mysqld
