@@ -1,0 +1,68 @@
+services:
+  mariadb:
+    build:
+      context: requirements/mariadb
+    image: mariadb:inception
+    container_name: mariadb
+    secrets:
+      - credentials
+    networks:
+      - inception-network
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    restart: always
+ 
+  wordpress:
+    build:
+      context: requirements/wordpress
+    image: wordpress:inception
+    container_name: wordpress
+    secrets:
+      - credentials
+    depends_on:
+      - mariadb
+    networks:
+      - inception-network
+    volumes:
+      - wordpress_data:/var/www/html
+    restart: always
+ 
+  nginx:
+    build:
+      context: requirements/nginx
+    image: nginx:inception
+    container_name: nginx
+    secrets:
+      - credentials
+    depends_on:
+      - wordpress
+    networks:
+      - inception-network
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress_data:/var/www/html
+    restart: always
+ 
+networks:
+  inception-network:
+    driver: bridge
+ 
+volumes:
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/${USER}/data/mariadb
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/${USER}/data/wordpress
+ 
+secrets:
+  credentials:
+    file: ./secrets/.env
+
