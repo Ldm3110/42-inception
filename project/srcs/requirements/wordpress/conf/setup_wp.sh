@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+source /run/secrets/credentials
+
 # Required variables (fail early with a clear message if missing)
 : "${DB_HOST:=mariadb}"
 : "${DB_NAME:?DB_NAME is required}"

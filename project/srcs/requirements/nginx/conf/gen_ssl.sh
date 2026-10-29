@@ -1,9 +1,15 @@
 #!/bin/bash
 set -e
 
+source /run/secrets/credentials
+
 # Default domain if not provided
 : "${DOMAIN_NAME:=localhost}"
 export DOMAIN_NAME   
+
+SSL_DIR=/etc/nginx/ssl
+CRT="$SSL_DIR/nginx.crt"
+KEY="$SSL_DIR/nginx.key"
 
 # Generate SSL certificate if it doesn't exist
 if [ ! -f /etc/nginx/ssl/nginx.crt ]; then
@@ -13,10 +19,10 @@ if [ ! -f /etc/nginx/ssl/nginx.crt ]; then
 		-keyout "$KEY" -out "$CRT" \
 		-subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=${DOMAIN_NAME}"
 
-	chmod 600 /etc/nginx/ssl/nginx.key
-	chmod 644 /etc/nginx/ssl/nginx.crt
+	chmod 600 "$KEY"
+	chmod 644 "$CRT" 
 
-    echo "SSL certificate generated at /etc/nginx/ssl/"
+	echo "SSL certificate generated at $SSL_DIR"
 else
     echo "SSL certificate already exists. Skipping generation."
 fi
